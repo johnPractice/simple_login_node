@@ -23,7 +23,8 @@
         "epress": "0.0.1-security",
         "express": "^4.17.1",
         "mongodb": "^3.6.2",
-        "mongoose": "^5.10.7"
+        "mongoose": "^5.10.7",
+        "validator": "^13.1.17"
     },
     "devDependencies": {
         "nodemon": "^2.0.4",
