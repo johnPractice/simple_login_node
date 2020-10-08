@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const constants = require('../../../constants');
 // time stamp for modify date :)//
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
@@ -46,40 +48,59 @@ const userSchema = new Schema({
         type: Number,
         default: 0,
     },
-
+    tokens: [{
+        token: {
+            type: String,
+            require: true
+        }
+    }]
 }, {
     autoCreate: true,
     autoIndex: true,
-    timestamps: true
-
+    timestamps: true,
 });
 // modified function//
-// create  middelware for check password 
+// create  middelware for check password
 // if password modified ==>hashed then store to db and check
 ///we must use classic function to not bind this
-userSchema.pre('save', async function(next) {
+userSchema.pre("save", async function(next) {
     const user = this;
-    console.log('this save pre', user);
-    if (this.isModified('password')) {
+    console.log("this save pre", user);
+    if (this.isModified("password")) {
         user.password = await bcrypt.hash(user.password, 8);
         user.re_password = user.password;
     }
 
     next();
 });
+// generate auth token
+userSchema.methods.genrateAuth = async function() {
+    const user = this;
+    const token = await jwt.sign({
+        _id: user._id.toString()
+    }, constants.jwtSecret);
 
-// toJson 
+    user.tokens = user.tokens.concat({
+        token
+    });
+    await user.save();
+    return token;
+};
+// toJson
 ///for retunrning in api json
 userSchema.methods.toJSON = function() {
     const user = this;
     const userObject = user.toObject();
     delete userObject.password;
     delete userObject.re_password;
+    delete userObject.tokens;
+    delete userObject.createdAt;
+    delete userObject.updatedAt;
 
     return userObject;
 };
 
 // create user model save in mongoose
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
