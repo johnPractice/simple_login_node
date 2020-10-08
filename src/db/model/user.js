@@ -86,6 +86,20 @@ userSchema.methods.genrateAuth = async function() {
     await user.save();
     return token;
 };
+//statics methode 
+userSchema.statics.findByCredentials = async({
+    username,
+    password
+}) => {
+    const user = await User.findOne({
+        username
+    });
+    if (!user) return new Error('cant login');
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return new Error('please check your password');
+    return user;
+
+};
 // toJson
 ///for retunrning in api json
 userSchema.methods.toJSON = function() {
