@@ -2,11 +2,11 @@ const rout = require("express").Router();
 
 const User = require("../db/model/user");
 
-rout.get("/user", (req, res) => {
+rout.get("/", (req, res) => {
     res.json("Hi user");
 });
 
-rout.post("/user", async(req, res) => {
+rout.post("/", async(req, res) => {
     const info = req.body;
     try {
         const user = new User(info);
@@ -20,7 +20,7 @@ rout.post("/user", async(req, res) => {
         res.json(e).status(400);
     }
 });
-rout.post('/user/login', async(req, res) => {
+rout.post('/login', async(req, res) => {
     const {
         password,
         username

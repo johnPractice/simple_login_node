@@ -5,7 +5,7 @@ const userRouter = require("./routers/userRouter");
 
 const app = express();
 app.use(express.json());
-app.use(userRouter);
+app.use('/user', userRouter);
 // app.use(taskRouter);
 
 module.exports = app;
