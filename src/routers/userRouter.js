@@ -44,6 +44,27 @@ rout.post('/login', async(req, res) => {
         res.json(e).status(400);
     }
 });
+// logout user
+rout.post('/logout', auth, async(req, res) => {
+    try {
+        const user = req.user;
+        const token = req.token;
+        user.tokens = user.tokens.filter(t => {
+            return t.token != token;
+        });
+
+        await user.save();
+
+        res.json({
+            user,
+            'logout': true
+        });
+
+
+    } catch (e) {
+        res.json(e).status(400);
+    }
+});
 // logout all
 rout.post('/logoutall', auth, async(req, res) => {
     try {
