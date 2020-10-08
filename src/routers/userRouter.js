@@ -1,6 +1,8 @@
 const rout = require("express").Router();
 
 const User = require("../db/model/user");
+// middelware using 
+const auth = require('../middelware/auth');
 
 rout.get("/", (req, res) => {
     res.json("Hi user");
@@ -20,6 +22,7 @@ rout.post("/", async(req, res) => {
         res.json(e).status(400);
     }
 });
+// login user
 rout.post('/login', async(req, res) => {
     const {
         password,
@@ -36,6 +39,18 @@ rout.post('/login', async(req, res) => {
             token,
             user
         });
+
+    } catch (e) {
+        res.json(e).status(400);
+    }
+});
+// logout all
+rout.post('/logoutall', auth, async(req, res) => {
+    try {
+        const user = req.user;
+        user.tokens = [];
+        await user.save();
+        res.json(user);
 
     } catch (e) {
         res.json(e).status(400);
