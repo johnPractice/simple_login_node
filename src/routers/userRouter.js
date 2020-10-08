@@ -8,8 +8,6 @@ rout.get("/user", (req, res) => {
 
 rout.post("/user", async(req, res) => {
     const info = req.body;
-    console.log("info", info);
-
     try {
         const user = new User(info);
         await user.save();
@@ -18,6 +16,27 @@ rout.post("/user", async(req, res) => {
             user,
             token
         });
+    } catch (e) {
+        res.json(e).status(400);
+    }
+});
+rout.post('/user/login', async(req, res) => {
+    const {
+        password,
+        username
+    } = req.body;
+    if (!password || !username) return new Error('please check your input');
+    try {
+        const user = await User.findByCredentials({
+            username,
+            password
+        });
+        const token = await user.genrateAuth();
+        res.json({
+            token,
+            user
+        });
+
     } catch (e) {
         res.json(e).status(400);
     }
