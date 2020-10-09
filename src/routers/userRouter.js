@@ -1,11 +1,16 @@
 const rout = require("express").Router();
 const multer = require('multer');
 const sharp = require('sharp');
+const multerTest = require('multer');
+const path = require('path');
+const fs = require("fs");
+const constants = require('../../constants');
 
 // const fileUploader = require('express-fileupload');
 const User = require("../db/model/user");
 // middelware using 
 const auth = require('../middelware/auth');
+const { findOne } = require("../db/model/user");
 
 // multer setup 
 // const storage = multer.diskStorage({
@@ -36,13 +41,42 @@ const upload = multer({
     },
     fileFilter(req, file, cb) {
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new Error('Please upload an image'))
+            return cb(new Error('Please upload an image'));
         }
 
         cb(undefined, true);
     }
 });
 
+
+// test
+const storage = multerTest.diskStorage({
+    destination: async function(req, file, cb) {
+        if (!fs.existsSync('public/')) {
+            fs.mkdirSync('public/');
+            if (!fs.existsSync('public/uploads'))
+                fs.mkdirSync('public/uploads/');
+        }
+        cb(null, 'public/uploads/');
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+const uploadTest = multer({
+    // dest: 'uploads/test',
+    // limits: {
+    //     fileSize: 1000000
+    // },
+    // fileFilter(req, file, cb) {
+    //     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    //         return cb(new Error('Please upload an image'));
+    //     }
+
+    //     cb(undefined, true);
+    // },
+    storage: storage
+});
 
 //rout 
 rout.get("/", (req, res) => {
@@ -146,5 +180,34 @@ rout.get('/avatar', auth, async(req, res) => {
     } catch (e) {
         res.status(404).send();
     }
-})
+});
+
+
+// test
+rout.post('/test', auth, uploadTest.single('test'), async(req, res) => {
+    try {
+        const file = req.file;
+        const user = req.user;
+        let { path } = file;
+        path = path.replace('public', "");
+        path = path.replace("\\", "/");
+        path = constants.usrAddLocal + path;
+        user.test = path;
+        await user.save();
+        res.json({ file, user });
+    } catch (e) { res.json(e).status(400); }
+
+});
+
+rout.get('/test', async(req, res) => {
+    try {
+        const { username } = req.body;
+        if (!username) return new Error('check your input');
+        const user = await User.findOne({ username });
+        if (!user) return new Error('user not found');
+        res.json(user.test);
+    } catch (e) { res.json(e).status(400); }
+
+});
+
 module.exports = rout;
