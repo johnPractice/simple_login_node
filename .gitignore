@@ -2,3 +2,4 @@ node_modules
 constants.js
 .env
 .vscode
+uploads
