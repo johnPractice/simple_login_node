@@ -18,9 +18,9 @@ const userSchema = new Schema({
     },
     username: {
         type: String,
-        require: true,
-        minlength: 4,
         unique: true,
+        require: true,
+        minlength: 4
     },
     email: {
         type: String,
@@ -48,12 +48,17 @@ const userSchema = new Schema({
         type: Number,
         default: 0,
     },
+    avatar: {
+        type: Buffer,
+        default: null
+    },
     tokens: [{
         token: {
             type: String,
             require: true
         }
     }]
+
 }, {
     autoCreate: true,
     autoIndex: true,
