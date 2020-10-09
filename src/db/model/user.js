@@ -52,6 +52,10 @@ const userSchema = new Schema({
         type: Buffer,
         default: null
     },
+    test: {
+        type: String,
+        default: null
+    },
     tokens: [{
         token: {
             type: String,
