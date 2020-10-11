@@ -152,6 +152,24 @@ rout.post('/logoutall', auth, async(req, res) => {
         res.json(e).status(400);
     }
 });
+// update user
+rout.put('/update', auth, async(req, res) => {
+    try {
+        const user = req.user;
+        const canUpdate = ['firstname', 'lastname', 'username', 'email', 'password', 'birthday'];
+        const dataUpdated = req.body;
+        canUpdate.forEach((update) => {
+            if (dataUpdated[update]) {
+                user[update] = dataUpdated[update];
+            }
+        });
+        await user.save();
+        res.json(user).status(200);
+
+    } catch (e) {
+        res.json(e).status(400);
+    }
+});
 // upload avatar image 
 rout.post('/upload-avatar', auth, upload.single('avatar'), async(req, res) => {
 
