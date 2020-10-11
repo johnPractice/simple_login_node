@@ -84,9 +84,16 @@ rout.get("/", (req, res) => {
 });
 
 rout.post("/", async(req, res) => {
-    const info = req.body;
     try {
-        const user = new User(info);
+        const info = req.body;
+        const canUpdate = ['firstname', 'lastname', 'username', 'email', 'password', 'birthday'];
+        const user = new User();
+
+        canUpdate.forEach((update) => {
+            if (info[update]) {
+                user[update] = info[update];
+            }
+        });
         await user.save();
         const token = await user.genrateAuth();
         res.json({
