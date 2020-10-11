@@ -11,6 +11,7 @@ const User = require("../db/model/user");
 // middelware using 
 const auth = require('../middelware/auth');
 const { findOne } = require("../db/model/user");
+const app = require("../app");
 
 // multer setup 
 // const storage = multer.diskStorage({
@@ -173,6 +174,16 @@ rout.put('/update', auth, async(req, res) => {
         await user.save();
         res.json(user).status(200);
 
+    } catch (e) {
+        res.json(e).status(400);
+    }
+});
+// delet user 
+rout.delete('/', auth, async(req, res) => {
+    try {
+        const user = req.user;
+        await user.delete();
+        res.json('user deleted :)').status(200);
     } catch (e) {
         res.json(e).status(400);
     }
