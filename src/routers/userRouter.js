@@ -10,8 +10,6 @@ const constants = require('../../constants');
 const User = require("../db/model/user");
 // middelware using 
 const auth = require('../middelware/auth');
-const { findOne } = require("../db/model/user");
-const app = require("../app");
 
 // multer setup 
 // const storage = multer.diskStorage({
